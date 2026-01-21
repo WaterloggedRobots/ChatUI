@@ -7,11 +7,9 @@ from PySide6.QtCore import Signal, QObject
 # ======================
 # CONFIG
 # ======================
-IP = "http://192.168.0.247"
+IP = "192.168.0.247"
 PORT = "8000"
-VLLM_URL = f"{IP}:{PORT}/v1/chat/completions"
-MODELS_URL = f"{IP}:{PORT}/v1/models"
-ADMIN_URL = f"{IP}:9000/admin/switch_model"
+
 
 MAX_CONTEXT_MESSAGES = 16
 SUMMARY_TRIGGER_COUNT = 24
@@ -28,7 +26,13 @@ class LLMClient(QObject):
         super().__init__()
         self.model_name = None
         self.temperature = 0.7
-
+        
+        self.ip = IP
+        self.port = PORT
+        self.VLLM_URL = f"http://{self.ip}:{self.port}/v1/chat/completions"
+        self.MODELS_URL = f"http://{self.ip}:{self.port}/v1/models"
+        self.ADMIN_URL = f"http://{self.ip}:9000/admin/switch_model"
+        
         self.preset = ""                 # system role, immutable
         self.messages = []               # visible chat
         self.payload_messages = []       # full payload
@@ -45,7 +49,7 @@ class LLMClient(QObject):
         self.model_name = model
 
     def set_preset(self, text: str):
-        self.preset = text.strip()
+        self.preset = text.strself.ip()
 
     # ----------------------
     # Chat API
@@ -123,7 +127,7 @@ class LLMClient(QObject):
             "stream": False
         }
 
-        r = requests.post(VLLM_URL, json=payload, timeout=300)
+        r = requests.post(self.VLLM_URL, json=payload, timeout=300)
         r.raise_for_status()
         return r.json()["choices"][0]["message"]["content"]
 
@@ -140,7 +144,7 @@ class LLMClient(QObject):
 
         try:
             with requests.post(
-                VLLM_URL,
+                self.VLLM_URL,
                 json=payload,
                 stream=True,
                 timeout=600
@@ -207,7 +211,7 @@ class LLMClient(QObject):
     # ----------------------
     def request_model_switch(self, model_name: str):
         r = requests.post(
-            ADMIN_URL,
+            self.ADMIN_URL,
             params={"model": model_name},
             timeout=5
         )
@@ -220,7 +224,7 @@ class LLMClient(QObject):
         deadline = time.time() + timeout
         while time.time() < deadline:
             try:
-                r = requests.get(MODELS_URL, timeout=2)
+                r = requests.get(self.MODELS_URL, timeout=2)
                 if r.ok:
                     return True
             except requests.RequestException:
@@ -236,7 +240,7 @@ class LLMClient(QObject):
         self.model_name = model_name
 
     def get_model(self):
-        r = requests.get(MODELS_URL, timeout=2)
+        r = requests.get(self.MODELS_URL, timeout=2)
         q = r.json()
         #print(q)
         model_name = q['data'][0]["id"]

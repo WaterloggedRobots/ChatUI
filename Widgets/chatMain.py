@@ -685,3 +685,36 @@ class EditMessage(QMainWindow):
         """Connect button signals to functions"""
         #self.ui.pushButton.clicked.connect(self.load_bot_dir)
         pass
+
+class ServerIP(QMainWindow):
+
+    def __init__(self, pd, fd):
+        super().__init__()
+        self.directoryParent = pd
+        self.directoryDefault = fd
+        self.load_ui()
+        self.setup_connections()
+
+    def load_ui(self):
+        try:
+            ui_file = QFile(self.directoryDefault+r"\UI\server ip.ui")  # Change to your .ui file name
+            if not ui_file.open(QFile.ReadOnly):
+                print(f"Cannot open UI file: {ui_file.errorString()}")
+                return
+
+            loader = QUiLoader()
+            self.ui = loader.load(ui_file)
+            ui_file.close()
+
+            if self.ui:
+                self.setCentralWidget(self.ui)
+                self.setWindowTitle("Server IP Address")
+
+
+        except Exception as e:
+            print(f"Error loading UI: {e}")
+
+    def setup_connections(self):
+        """Connect button signals to functions"""
+        #self.ui.pushButton.clicked.connect(self.load_bot_dir)
+        pass

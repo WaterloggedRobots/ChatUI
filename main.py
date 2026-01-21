@@ -83,6 +83,7 @@ class Main:
         mainChat.ui.actionNew_Chat.triggered.connect(self.newChatSettings)
         mainChat.ui.listWidget.clicked.connect(self.quick_select_chat)
         mainChat.ui.actionEdit_Message.triggered.connect(self.openEditMsg)
+        mainChat.ui.actionSet_IP.triggered.connect(self.openIPSettings)
 
         settingsChat.ui.pushButton_2.clicked.connect(self.newBot)
         settingsChat.ui.pushButton_3.clicked.connect(self.cancelChatSettings)
@@ -93,6 +94,8 @@ class Main:
         emptyStart.ui.pushButton.clicked.connect(self.newChatSettings)
 
         messageEdit.ui.pushButton.clicked.connect(self.exitEditMsg)
+
+        settingsIP.ui.pushButton.clicked.connect(self.exitIPSettings)
 
     def read_json_file(self, file_path):
         """Read a JSON file and return its contents"""
@@ -183,6 +186,17 @@ class Main:
     def exitEditMsg(self):
         mainChat.edit_last_user_message(messageEdit.ui.plainTextEdit.toPlainText().strip())
         messageEdit.close()
+
+    def openIPSettings(self):
+        ip = mainChat.client.ip
+        settingsIP.show()
+        settingsIP.ui.lineEdit.setText(ip)
+
+    def exitIPSettings(self):
+        mainChat.client.ip = settingsIP.ui.lineEdit.text()
+        print("IP Set To: ", mainChat.client.ip)
+        settingsIP.close()
+
 if __name__ == "__main__":
     QCoreApplication.setOrganizationName("Waterlogged")
     QCoreApplication.setApplicationName("ChatUI")
@@ -216,6 +230,8 @@ if __name__ == "__main__":
     warningLeaveEmpty = warningWidget.EmptyLeave(str(data_dir),parent_directory)
     invalidChatSettings = warningWidget.InvalidChatSettings(str(data_dir),parent_directory)
     messageEdit = chatMain.EditMessage(str(data_dir),parent_directory)
+    settingsIP = chatMain.ServerIP(str(data_dir),parent_directory)
+
     connector = Main()
 
     if find_json_with_format(str(data_dir) + r"\Save\Chat", SETTINGS_KEYS) is not None:

@@ -376,7 +376,7 @@ color:rgb(255, 255, 255)</string>
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>0.3.4</string>
+         <string>0.4.1</string>
         </property>
        </widget>
       </item>
@@ -421,9 +421,16 @@ color:rgb(255, 255, 255)</string>
     <addaction name="actionCreate_New_Chara"/>
     <addaction name="actionEdit_Chara"/>
    </widget>
+   <widget class="QMenu" name="menuServer">
+    <property name="title">
+     <string>Server</string>
+    </property>
+    <addaction name="actionSet_IP"/>
+   </widget>
    <addaction name="menuChat"/>
    <addaction name="menuChara"/>
    <addaction name="menuCharacter"/>
+   <addaction name="menuServer"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionEdit_Message">
@@ -479,6 +486,11 @@ color:rgb(255, 255, 255)</string>
   <action name="actionEdit_Chara">
    <property name="text">
     <string>Edit Chara</string>
+   </property>
+  </action>
+  <action name="actionSet_IP">
+   <property name="text">
+    <string>Set IP</string>
    </property>
   </action>
  </widget>
