@@ -84,6 +84,8 @@ class Main:
         mainChat.ui.listWidget.clicked.connect(self.quick_select_chat)
         mainChat.ui.actionEdit_Message.triggered.connect(self.openEditMsg)
         mainChat.ui.actionSet_IP.triggered.connect(self.openIPSettings)
+        mainChat.ui.actionCreate_New_chara.triggered.connect(self.newBot)
+        mainChat.ui.actionEdit_Chara.triggered.connect(self.loadBot)
 
         settingsChat.ui.pushButton_2.clicked.connect(self.newBot)
         settingsChat.ui.pushButton_3.clicked.connect(self.cancelChatSettings)
