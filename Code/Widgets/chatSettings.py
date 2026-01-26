@@ -12,6 +12,7 @@ class ChatSettings(QMainWindow):
         self.directoryParent = pd
         self.directoryDefault = fd
         self.chatPath = ""
+        self.chatName =""
         self.botSettingPath = ""
         self.scene = QGraphicsScene()
         self.chatHist =[]
@@ -233,10 +234,12 @@ class ChatSettings(QMainWindow):
             chat_dir = Path(chat_dir+".json")
             chat_dir_str = str(chat_dir.stem)
 
-        print("Saving: ", chat_dir)
+        print("Saving: ", chat_dir_str)
         if chat_dir_str in logs["ChatList"] and logs["ChatList"].index(chat_dir_str) != len(logs["ChatList"])-1:
             logs["ChatList"].remove(chat_dir_str)
         if chat_dir_str not in logs["ChatList"]:
+            if self.chatName != "":
+                logs["ChatList"].remove(self.chatName)
             logs["ChatList"].append(chat_dir_str)
         logs["LastChat"]=str(chat_dir)
         with open(logsPath, "w", encoding="utf-8") as f:
@@ -277,6 +280,7 @@ class ChatSettings(QMainWindow):
             if settings is not None:
                 self.botSettingPath = settings["Bot Path"]
                 self.ui.lineEdit.setText(settings["Name"])
+                self.chatName = settings["Name"]
                 self.load_bot(self.botSettingPath)
                 self.ui.doubleSpinBox.setValue(settings["Temperature"])
                 self.ui.comboBox.setCurrentText(settings["Model"])

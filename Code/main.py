@@ -249,11 +249,9 @@ if __name__ == "__main__":
         noChats = False
         mainChat.show()
 
-
     else:
         print(parent_directory + r"\Save\Chat")
         noChats = True
         emptyStart.show()
 
     sys.exit(app.exec())
-

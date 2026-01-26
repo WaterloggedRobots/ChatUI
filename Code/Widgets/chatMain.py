@@ -2,7 +2,7 @@ import llmClient
 
 from PySide6.QtWidgets import QMainWindow, QSizePolicy, QFileDialog
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, Qt
+from PySide6.QtCore import QFile, Qt, QObject, QEvent
 from PySide6.QtGui import QTextCursor, QIcon
 import json
 from pathlib import Path
@@ -10,6 +10,35 @@ import os
 import markdown
 import time
 from datetime import datetime
+
+class ShiftEnterFilter(QObject):
+    """
+    Intercepts Enter/Return on a QPlainTextEdit.
+    - Shift+Enter → inserts a literal newline.
+    - Enter        → calls ChatMain.sendMessage() and suppresses the
+                      default newline insertion.
+    """
+    def __init__(self, chat_main, input_widget, parent=None):
+        super().__init__(parent)      # parent is only for Qt's ownership
+        self.chat_main = chat_main    # reference to ChatMain
+        self.input_widget = input_widget
+
+    def eventFilter(self, obj, event):
+        # Only act on the input widget
+        if obj is not self.input_widget:
+            return False
+
+        if event.type() == QEvent.KeyPress and event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            if event.modifiers() & Qt.ShiftModifier:
+                # Shift‑Enter → literal newline
+                self.input_widget.insertPlainText("\n")
+                return True            # stop further processing
+
+            # Plain Enter → send the message
+            self.chat_main.sendMessage()
+            return True                # stop further processing
+
+        return False                    # let Qt process other events
 
 class ChatMain(QMainWindow):
     def __init__(self, pd, fd):
@@ -83,6 +112,8 @@ class ChatMain(QMainWindow):
         self.ui.actionDelete_Message.triggered.connect(self.delete_last_user_exchange)
 
         self.input = self.ui.plainTextEdit
+        self._shift_filter = ShiftEnterFilter(self, self.input, parent=self)
+        self.input.installEventFilter(self._shift_filter)
 
     def on_token(self, text):
         if self.response_cursor is None:
@@ -144,8 +175,10 @@ class ChatMain(QMainWindow):
             if event.key() in (Qt.Key_Return, Qt.Key_Enter):
                 if event.modifiers() & Qt.ShiftModifier:
                     self.input.insertPlainText("\n")
+                    print("newline")
                 else:
                     self.sendMessage()
+                    print("sendMessage")
                 return
         super().keyPressEvent(event)
 
@@ -313,9 +346,11 @@ class ChatMain(QMainWindow):
 
                 ts = self.format_ts(msg["ts"])
                 self.chat.append(f"\n<b>You</b>    <span style='color:#888'>[{ts}] </span>:")
-
+                text = msg['content']
+                text= text.replace(r"\n", "\n")
+                text = text.replace("\n", "<br/>")
                 self.chat.insertHtml(
-                    f"<div style='color:#ffffff; margin-left:12px;'>{msg['content']}</div>"
+                    f"<div style='color:#ffffff; margin-left:12px;'>{text}</div>"
                 )
 
             else:
@@ -378,6 +413,9 @@ class ChatMain(QMainWindow):
 
         if not text:
             return
+
+        text = text.replace(r"\n", "\n")
+        text = text.replace("\n", "<br/>")
 
         # UI
         ts = self.format_ts(self.now_ts())
