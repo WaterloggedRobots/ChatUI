@@ -215,8 +215,16 @@ if __name__ == "__main__":
     parent_directory = os.path.dirname(current_script_path)
     tempLogFile = save_dir / ".temp.json"
     if not tempLogFile.exists():
+        """
+    
         tempLogFileImport = Path(parent_directory)/ "Save" / ".temp.json"
         tempLog = read_json_file(tempLogFileImport)
+        """
+        tempLog={
+                "LastOpened": "",
+                "LastChat": "",
+                "ChatList": []
+        }
 
         with open(tempLogFile, "w", encoding="utf-8") as f:
             json.dump(tempLog, f, indent=4)
