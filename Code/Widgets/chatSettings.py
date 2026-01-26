@@ -199,10 +199,13 @@ class ChatSettings(QMainWindow):
         logsPath =Path(self.directoryParent) / "Save" / ".temp.json"
         logs = self.read_json_file(logsPath)
 
+        """
         if True:
             pass
         else:
             return
+        """
+
         chat_name = self.ui.lineEdit.text().strip()
         if chat_name == "":
             chat_name = "New Chat"
